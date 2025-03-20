@@ -19,9 +19,9 @@ public class UIManager : MonoBehaviour
         timeElapsed += Time.deltaTime;
 
         // Increase score by 10 every second
-        if (timeElapsed >= 1f)
+        if (timeElapsed >= 0.1f)
         {
-            IncreaseScore(10);
+            IncreaseScore(1);
             timeElapsed = 0f; // Reset the timer
         }
 

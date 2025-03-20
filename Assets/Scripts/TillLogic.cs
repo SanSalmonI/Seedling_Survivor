@@ -13,6 +13,10 @@ public class Till : MonoBehaviour
     [Tooltip("Cooldown duration in seconds when planted.")]
     public float plantedCooldown = 5f;
 
+    [Header("Score settings")]
+    public int scoreValue = 100;
+    public GameObject scorePrefab; // Prefab to instantiate when score increases
+
     [Header("Sprites")]
     public Sprite idleSprite;
     public Sprite plantedSprite;
@@ -25,13 +29,26 @@ public class Till : MonoBehaviour
     private TillState currentState = TillState.Idle;
     private float cooldownTimer = 0f;
     private SpriteRenderer spriteRenderer;
+    private float timeElapsed = 0f;
 
+    // Reference to the UIManager
+    private UIManager uiManager;
+
+    [System.Obsolete]
     void Start()
     {
         // Get the SpriteRenderer component
         spriteRenderer = GetComponent<SpriteRenderer>();
         // Set the initial sprite
         UpdateSprite();
+        // Find the UIManager in the scene
+        uiManager = FindObjectOfType<UIManager>();
+
+        // Ensure the scorePrefab is assigned
+        if (scorePrefab == null)
+        {
+            Debug.LogError("Score Prefab is not assigned.");
+        }
     }
 
     void Update()
@@ -50,6 +67,23 @@ public class Till : MonoBehaviour
                 currentState = TillState.Dead;
                 // Update the sprite for the "dead" state
                 UpdateSprite();
+            }
+            else
+            {
+                // Increment time elapsed
+                timeElapsed += Time.deltaTime;
+
+                // Increase score by 10 every second
+                if (timeElapsed >= 1f)
+                {
+                    uiManager.IncreaseScore(scoreValue);
+                    // Instantiate the score prefab
+                    if (scorePrefab != null)
+                    {
+                        Instantiate(scorePrefab, transform.position, Quaternion.identity);
+                    }
+                    timeElapsed = 0f; // Reset the timer
+                }
             }
         }
     }

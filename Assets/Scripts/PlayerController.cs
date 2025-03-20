@@ -20,10 +20,16 @@ public class PlayerController : MonoBehaviour
     private bool isFrozen = false;
     private float freezeTimer = 0f;
 
+    // Reference to the PlayerHealthUI
+    private PlayerHealthUI playerHealthUI;
+
+    [System.Obsolete]
     void Awake()
     {
         // Get and cache the Rigidbody2D
         rb2d = GetComponent<Rigidbody2D>();
+        // Find the PlayerHealthUI in the scene
+        playerHealthUI = FindObjectOfType<PlayerHealthUI>();
     }
 
     void Update()
@@ -44,8 +50,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Gather input from WASD or arrow keys.
-            // By default, "Horizontal" uses A/D or Left/Right,
-            // and "Vertical" uses W/S or Up/Down.
             float moveX = Input.GetAxisRaw("Horizontal");
             float moveY = Input.GetAxisRaw("Vertical");
 
@@ -62,6 +66,19 @@ public class PlayerController : MonoBehaviour
                 freezeTimer = TillfreezeDuration;
                 rb2d.linearVelocity = Vector2.zero; // Stop the player's movement
             }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        // Check if the collision is with an enemy
+        if (collider.gameObject.CompareTag("Enemy"))
+        {
+            // Notify the PlayerHealthUI to lose a life
+            playerHealthUI.LoseOneLife();
+
+            // Optionally, destroy the enemy or handle the collision in another way
+            Destroy(collider.gameObject);
         }
     }
 }
